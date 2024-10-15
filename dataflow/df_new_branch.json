@@ -1,0 +1,87 @@
+{
+	"name": "df_new_branch",
+	"properties": {
+		"description": "Inline dataset example.",
+		"folder": {
+			"name": "4.new_branch"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_asql_awdw_2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sourceProduct"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_storage_abs_customer",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkCSV"
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_storage_abs_customer",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkJSON"
+				}
+			],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          ProductID as integer,",
+				"          Name as string,",
+				"          ProductNumber as string,",
+				"          Color as string,",
+				"          StandardCost as decimal(19,4),",
+				"          ListPrice as decimal(19,4),",
+				"          Size as string,",
+				"          Weight as decimal(8,2),",
+				"          ProductCategoryID as integer,",
+				"          ProductModelID as integer,",
+				"          SellStartDate as timestamp,",
+				"          SellEndDate as timestamp,",
+				"          DiscontinuedDate as timestamp,",
+				"          ThumbNailPhoto as binary,",
+				"          ThumbnailPhotoFileName as string,",
+				"          rowguid as string,",
+				"          ModifiedDate as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'query',",
+				"     store: 'sqlserver',",
+				"     query: 'SELECT * FROM SalesLT.Product',",
+				"     isolationLevel: 'READ_UNCOMMITTED') ~> sourceProduct",
+				"sourceProduct sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     container: 'dataflowdataset',",
+				"     folderPath: '4_new_branch',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     partitionFileNames:['product.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sinkCSV",
+				"sourceProduct sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'json',",
+				"     container: 'dataflowdataset',",
+				"     folderPath: '4_new_branch',",
+				"     partitionFileNames:['product.json'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sinkJSON"
+			]
+		}
+	}
+}

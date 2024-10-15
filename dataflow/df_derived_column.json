@@ -1,0 +1,77 @@
+{
+	"name": "df_derived_column",
+	"properties": {
+		"folder": {
+			"name": "9.derived_columns"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "asql_awdw_customer",
+						"type": "DatasetReference"
+					},
+					"name": "queryTable"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_storage_abs_customer",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Categoria as string,",
+				"          Producto as string,",
+				"          UnitPrice as decimal(19,4),",
+				"          UnitPriceDiscount as decimal(19,4)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT PC.Name Categoria, P.Name Producto, OD.UnitPrice, OD.UnitPriceDiscount\\nFROM [SalesLT].[ProductCategory] AS PC\\n     INNER JOIN [SalesLT].[Product] AS P ON P.ProductCategoryID=PC.ProductCategoryID\\n     INNER JOIN [SalesLT].[SalesOrderDetail] AS OD ON OD.ProductID=P.ProductID',",
+				"     format: 'query') ~> queryTable",
+				"queryTable derive(CATEGORIA = upper(Categoria),",
+				"          PRODUCTO = upper(Producto),",
+				"          MONTO_TOTAL = toDecimal(UnitPrice-UnitPriceDiscount)) ~> derivedColumn",
+				"derivedColumn select(mapColumn(",
+				"          Categoria = queryTable@Categoria,",
+				"          Producto = queryTable@Producto,",
+				"          UnitPrice,",
+				"          UnitPriceDiscount,",
+				"          Categoria = derivedColumn@CATEGORIA,",
+				"          Producto = derivedColumn@PRODUCTO,",
+				"          MontoTotal = MONTO_TOTAL",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     container: 'dataflowdataset',",
+				"     folderPath: '9_derived_column/output',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     partitionFileNames:['output.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

@@ -1,0 +1,28 @@
+{
+	"name": "DestinationDataset_w88",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ADLS_https_github",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "1.https_lego"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "themes.txt",
+				"fileSystem": "lego"
+			},
+			"columnDelimiter": ",",
+			"rowDelimiter": "\n",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

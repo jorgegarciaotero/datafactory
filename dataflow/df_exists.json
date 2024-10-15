@@ -1,0 +1,123 @@
+{
+	"name": "df_exists",
+	"properties": {
+		"folder": {
+			"name": "7.exists"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "adls_datalake_clientes",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sourceCliente"
+				},
+				{
+					"linkedService": {
+						"referenceName": "adls_datalake_clientes",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sourceServicios"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_storage_abs_customer",
+						"type": "LinkedServiceReference"
+					},
+					"name": "notExistsSink"
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_storage_abs_customer",
+						"type": "LinkedServiceReference"
+					},
+					"name": "existsSink"
+				}
+			],
+			"transformations": [
+				{
+					"name": "notExistsCliente"
+				},
+				{
+					"name": "existCliente"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          CodCliente as short,",
+				"          Cliente as string,",
+				"          ApePatern as string,",
+				"          FechaNaci as date 'dd/MM/yyyy',",
+				"          DNI as integer,",
+				"          IdServicio as short",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'dataflowdataset',",
+				"     folderPath: '7_exists/input',",
+				"     fileName: 'Cliente.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> sourceCliente",
+				"source(output(",
+				"          IdServicio as short,",
+				"          Servicio as string,",
+				"          Fecha as date 'dd/MM/yyyy',",
+				"          MontoPagar as short",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'dataflowdataset',",
+				"     folderPath: '7_exists/input',",
+				"     fileName: 'Servicios.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> sourceServicios",
+				"sourceCliente, sourceServicios exists(sourceCliente@IdServicio == sourceServicios@IdServicio,",
+				"     negate:true,",
+				"     broadcast: 'auto')~> notExistsCliente",
+				"sourceCliente, sourceServicios exists(sourceCliente@IdServicio == sourceServicios@IdServicio,",
+				"     negate:false,",
+				"     broadcast: 'auto')~> existCliente",
+				"notExistsCliente sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     container: 'dataflowdataset',",
+				"     folderPath: '7_exists/output',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     partitionFileNames:['notExist.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> notExistsSink",
+				"existCliente sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     container: 'dataflowdataset',",
+				"     folderPath: '7_exists/output',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     partitionFileNames:['exists.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> existsSink"
+			]
+		}
+	}
+}

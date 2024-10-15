@@ -1,0 +1,148 @@
+{
+	"name": "df_conditional_split",
+	"properties": {
+		"folder": {
+			"name": "6.conditional_split"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_asql_awdw_2",
+						"type": "LinkedServiceReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_storage_abs_customer",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkRed"
+				},
+				{
+					"linkedService": {
+						"referenceName": "adls_datalake_clientes",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkBlack"
+				},
+				{
+					"linkedService": {
+						"referenceName": "adls_datalake_clientes",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkBlue"
+				},
+				{
+					"linkedService": {
+						"referenceName": "adls_datalake_clientes",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkOthers"
+				}
+			],
+			"transformations": [
+				{
+					"name": "conditionalSplitProduct"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          ProductID as integer,",
+				"          Name as string,",
+				"          ProductNumber as string,",
+				"          Color as string,",
+				"          StandardCost as decimal(19,4),",
+				"          ListPrice as decimal(19,4),",
+				"          Size as string,",
+				"          Weight as decimal(8,2),",
+				"          ProductCategoryID as integer,",
+				"          ProductModelID as integer,",
+				"          SellStartDate as timestamp,",
+				"          SellEndDate as timestamp,",
+				"          DiscontinuedDate as timestamp,",
+				"          ThumbNailPhoto as binary,",
+				"          ThumbnailPhotoFileName as string,",
+				"          rowguid as string,",
+				"          ModifiedDate as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'SalesLT',",
+				"     tableName: 'Product',",
+				"     isolationLevel: 'READ_UNCOMMITTED') ~> source1",
+				"source1 split(Color=='Red',",
+				"     Color=='Black',",
+				"     Color=='Blue',",
+				"     disjoint: false) ~> conditionalSplitProduct@(Red, Black, Blue, Others)",
+				"conditionalSplitProduct@Red sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     container: 'dataflowdataset',",
+				"     folderPath: '6_condional_split',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     partitionFileNames:['red.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sinkRed",
+				"conditionalSplitProduct@Black sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'dataflowdataset',",
+				"     folderPath: '6_condional_split',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     partitionFileNames:['black.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sinkBlack",
+				"conditionalSplitProduct@Blue sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'dataflowdataset',",
+				"     folderPath: '6_condional_split',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: false,",
+				"     partitionFileNames:['blue.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sinkBlue",
+				"conditionalSplitProduct@Others sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'dataflowdataset',",
+				"     folderPath: '6_condional_split',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     partitionFileNames:['others.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sinkOthers"
+			]
+		}
+	}
+}

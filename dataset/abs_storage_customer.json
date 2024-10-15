@@ -1,0 +1,27 @@
+{
+	"name": "abs_storage_customer",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_storage_abs_customer",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "4.new_branch"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"folderPath": "3_first_dataflow",
+				"container": "dataflowdataset"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

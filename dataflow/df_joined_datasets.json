@@ -1,0 +1,91 @@
+{
+	"name": "df_joined_datasets",
+	"properties": {
+		"folder": {
+			"name": "5.joins"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_storage_abs_customer",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sourceProduct"
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_storage_abs_customer",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sourceSubCatProducto"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_storage_abs_customer",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink"
+				}
+			],
+			"transformations": [
+				{
+					"name": "InnerJoin"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          ProductoId as short,",
+				"          NombreProducto as string,",
+				"          ProductoSubCategoriaId as short,",
+				"          Descripcion as string,",
+				"          Categoria as string,",
+				"          Color as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'excel',",
+				"     container: 'dataflowdataset',",
+				"     folderPath: '5_join/input',",
+				"     fileName: 'Producto.xlsx',",
+				"     sheetName: 'Producto',",
+				"     firstRowAsHeader: true) ~> sourceProduct",
+				"source(output(",
+				"          SubCategoriaProductoId as short,",
+				"          NombreSubCategoria as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'excel',",
+				"     container: 'dataflowdataset',",
+				"     folderPath: '5_join/input',",
+				"     fileName: 'SubCategoriaProducto.xlsx',",
+				"     sheetName: 'SubCategoriaProducto',",
+				"     firstRowAsHeader: true) ~> sourceSubCatProducto",
+				"sourceProduct, sourceSubCatProducto join(ProductoSubCategoriaId == SubCategoriaProductoId,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> InnerJoin",
+				"InnerJoin sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     container: 'dataflowdataset',",
+				"     folderPath: '5_join/output',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: false,",
+				"     partitionFileNames:['joined.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink"
+			]
+		}
+	}
+}

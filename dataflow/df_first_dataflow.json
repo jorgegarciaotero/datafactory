@@ -1,0 +1,42 @@
+{
+	"name": "df_first_dataflow",
+	"properties": {
+		"folder": {
+			"name": "3.first_dataflow"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "asql_awdw_customer",
+						"type": "DatasetReference"
+					},
+					"name": "sourceCustomer"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "abs_storage_customer",
+						"type": "DatasetReference"
+					},
+					"name": "sinkCustomer"
+				}
+			],
+			"transformations": [],
+			"scriptLines": [
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> sourceCustomer",
+				"sourceCustomer sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['customers'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sinkCustomer"
+			]
+		}
+	}
+}

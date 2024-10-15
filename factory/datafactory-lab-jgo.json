@@ -1,0 +1,9 @@
+{
+	"name": "datafactory-lab-jgo",
+	"location": "westeurope",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "838e371c-6e53-4e3b-8134-7a8af2eec99a",
+		"tenantId": "0d34d0ab-11db-4fbd-abfb-b9637ffca07f"
+	}
+}

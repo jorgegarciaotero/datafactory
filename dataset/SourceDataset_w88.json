@@ -1,0 +1,42 @@
+{
+	"name": "SourceDataset_w88",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "HTTP_Rebrtickable",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "1.https_lego"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "themes.csv.gz"
+			},
+			"columnDelimiter": ",",
+			"rowDelimiter": "\n",
+			"compressionCodec": "gzip",
+			"compressionLevel": "Optimal",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "19",
+				"type": "String"
+			},
+			{
+				"name": "Supplemental",
+				"type": "String"
+			},
+			{
+				"name": "1",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

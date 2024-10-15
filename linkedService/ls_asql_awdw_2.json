@@ -1,0 +1,18 @@
+{
+	"name": "ls_asql_awdw_2",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"description": "LS to connect to ASQL AdventureWorksDW database",
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"server": "azure-adf-jgo.database.windows.net",
+			"database": "azureAdventureWorksDW",
+			"encrypt": "mandatory",
+			"trustServerCertificate": false,
+			"authenticationType": "SQL",
+			"userName": "jgotero1",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQDA4OTQ2MEFFLUNGRUYtNENENy04NkExLTA5REJBRDY0NkVEMV9lOGVmNjgxOC0zNGI3LTQzM2UtYWM5ZS1jODNiMDRlNGI1MmQiDQp9"
+		}
+	}
+}

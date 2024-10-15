@@ -1,0 +1,59 @@
+{
+	"name": "adls_cliente",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "adls_datalake_clientes",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "2.move_transform_activities"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": "Cliente Nuevos",
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Cliente.xlsx",
+				"folderPath": "1_move_transform_activities",
+				"fileSystem": "dataset"
+			},
+			"firstRowAsHeader": true
+		},
+		"schema": [
+			{
+				"name": "Nombre Empresa",
+				"type": "String"
+			},
+			{
+				"name": "Nombre Cliente",
+				"type": "String"
+			},
+			{
+				"name": "Tipo Cliente",
+				"type": "String"
+			},
+			{
+				"name": "Linea",
+				"type": "String"
+			},
+			{
+				"name": "Nro Celular",
+				"type": "String"
+			},
+			{
+				"name": "Monto",
+				"type": "String"
+			},
+			{
+				"name": "Fecha Contratacion",
+				"type": "String"
+			},
+			{
+				"name": "Tipo Servicio",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
