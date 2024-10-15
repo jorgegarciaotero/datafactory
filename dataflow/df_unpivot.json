@@ -1,0 +1,85 @@
+{
+	"name": "df_unpivot",
+	"properties": {
+		"folder": {
+			"name": "12.unpivot"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "adls_datalake_clientes",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sourceUnpivot"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_storage_abs_customer",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "unpivot"
+				},
+				{
+					"name": "derivedColumn1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Empresas as string,",
+				"          Frutas as string,",
+				"          Cliente as string,",
+				"          {Cantidad (Kg)} as short,",
+				"          {Año} as short,",
+				"          {Ventas EE.UU. KG} as short,",
+				"          {Ventas China KG} as short,",
+				"          {Ventas España KG} as short,",
+				"          {Ventas Francia KG} as short,",
+				"          {Ventas Canada KG} as short",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'excel',",
+				"     fileSystem: 'dataflowdataset',",
+				"     folderPath: '11_unpivot',",
+				"     fileName: 'DataExportacionNoEstructurada.xlsx',",
+				"     sheetName: 'Data Exportacion',",
+				"     firstRowAsHeader: true) ~> sourceUnpivot",
+				"sourceUnpivot unpivot(output(",
+				"          Pais as string,",
+				"          {Precio(Kg)} as short",
+				"     ),",
+				"     ungroupBy(Empresas,",
+				"          Frutas,",
+				"          Cliente,",
+				"          {Cantidad (Kg)},",
+				"          {Año}),",
+				"     pivotValues: ['Ventas EE.UU. KG     ', 'Ventas China KG', 'Ventas España KG', 'Ventas Francia KG', 'Ventas Canada KG'],",
+				"     lateral: true,",
+				"     ignoreNullPivots: true) ~> unpivot",
+				"unpivot derive(PAIS = substring(Pais,instr(Pais,' '),instr(Pais,' KG'))) ~> derivedColumn1",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     container: 'dataflowdataset',",
+				"     folderPath: '11_unpivot',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     partitionFileNames:['salidaUnpivot.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}
